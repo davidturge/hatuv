@@ -5,6 +5,7 @@ export const AccountTypeEnum = Object.freeze({
 class Account {
   constructor(
     {
+      id = null,
       name,
       logo = '',
       groups = [],
@@ -18,6 +19,7 @@ class Account {
       }
     }
   ) {
+    this.id = id;
     this.name = name;
     this.logo = logo;
     this.groups = groups;

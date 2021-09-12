@@ -10,7 +10,7 @@ import {
 import User, { PermissionEnum } from '../models/user';
 import { useAuth } from '../store/auth-context';
 import { decrypt } from '../utils/encryption';
-import { USER_REGISTRATION_FORM_CONSTANTS } from '../constants/registration';
+import { USER_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
 
 const Register = () => {
   const { uid } = useParams();

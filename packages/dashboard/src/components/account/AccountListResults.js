@@ -36,11 +36,11 @@ const AccountListResults = ({ accounts, entitiesState }) => {
               <TableRow>
                 <StyledTableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedEntitiesIds.length === accounts.length}
+                    checked={selectedEntitiesIds.length === accounts.size}
                     color="primary"
                     indeterminate={
                       selectedEntitiesIds.length > 0
-                      && selectedEntitiesIds.length < accounts.length
+                      && selectedEntitiesIds.length < accounts.size
                     }
                     onChange={handleSelectAll}
                   />

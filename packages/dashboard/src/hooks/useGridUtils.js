@@ -6,13 +6,11 @@ const useGridUtils = (entities, { selectedEntitiesIds, setSelectedEntitiesIds })
 
   const handleSelectAll = (event) => {
     let newSelectedEntityIds;
-
     if (event.target.checked) {
-      newSelectedEntityIds = Array.from(entities).map(([, entity]) => entity.id);
+      newSelectedEntityIds = Array.from(entities).map(([key]) => key);
     } else {
       newSelectedEntityIds = [];
     }
-
     setSelectedEntitiesIds(newSelectedEntityIds);
   };
 

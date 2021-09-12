@@ -21,10 +21,7 @@ const AccountListToolbar = (props) => (
         color="primary"
         variant="contained"
       >
-        הוסף חשבון
-      </Button>
-      <Button>
-        הסר חשבון
+        הסר
       </Button>
     </Box>
     <Box sx={{ mt: 3 }}>

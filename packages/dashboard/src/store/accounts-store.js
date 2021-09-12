@@ -42,10 +42,12 @@ export default function createAccountsStore() {
     save: async (account) => {
       store.setState('pending');
       try {
-        const doc = await db.collection(store.collectionName).add({ ...account });
-        store.addAccount(doc.id, account);
+        const ref = await db.collection(store.collectionName).doc();
+        const newAccount = { ...account, id: ref.id };
+        await db.collection(store.collectionName).doc(ref.id).set(newAccount);
+        store.addAccount(ref.id, newAccount);
         store.setState('done');
-        return doc.id;
+        return ref.id;
       } catch (error) {
         store.setState('error');
         throw Error(error);

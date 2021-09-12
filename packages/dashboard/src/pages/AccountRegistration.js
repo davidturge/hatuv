@@ -8,7 +8,7 @@ import {
 import Account from '../models/account';
 import { useStore } from '../store/store-context';
 import { encrypt } from '../utils/encryption';
-import { ACCOUNT_REGISTRATION_FORM_CONSTANTS } from '../constants/registration';
+import { ACCOUNT_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
 
 const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
