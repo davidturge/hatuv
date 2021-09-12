@@ -1,0 +1,17 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "lerna": "4.0.0"
+  },
+  "scripts": {
+    "bootstrap": "yarn install && lerna bootstrap",
+    "lint:fix": "npx eslint --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
