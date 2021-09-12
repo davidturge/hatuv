@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -14,6 +14,7 @@ import { useAuth } from '../store/auth-context';
 
 const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -42,6 +43,7 @@ const Login = () => {
             onSubmit={(values) => {
               const { email, password } = values;
               login(email, password);
+              navigate('/admin/dashboard');
             }}
           >
             {({
