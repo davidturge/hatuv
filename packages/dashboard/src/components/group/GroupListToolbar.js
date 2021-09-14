@@ -6,10 +6,10 @@ import GroupProfile from './GroupProfile';
 const editGroup = 'ערוך קבוצה';
 const addGroup = 'הוסף קבוצה';
 
-const GroupListToolbar = ({ selectedGroupsIds }) => {
+const GroupListToolbar = ({ selectedGroupIds }) => {
   const { uiStore } = useStore();
   const onEditGroupClicked = () => {
-    const id = selectedGroupsIds[0] || null;
+    const id = selectedGroupIds[0] || null;
     const title = id ? editGroup : addGroup;
     uiStore.showDialog(title, <GroupProfile id={id} />);
   };
@@ -25,7 +25,7 @@ const GroupListToolbar = ({ selectedGroupsIds }) => {
         <Button
           color="primary"
           variant="contained"
-          disabled={!(selectedGroupsIds.length <= 1)}
+          disabled={!(selectedGroupIds.length <= 1)}
           onClick={onEditGroupClicked}
         >
           הוסף קבוצה
@@ -36,6 +36,6 @@ const GroupListToolbar = ({ selectedGroupsIds }) => {
 };
 
 GroupListToolbar.propTypes = {
-  selectedGroupsIds: PropTypes.array
+  selectedGroupIds: PropTypes.array
 };
 export default GroupListToolbar;

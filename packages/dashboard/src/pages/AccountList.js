@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '../store/store-context';
 import AccountListResults from '../components/account/AccountListResults';
 import AccountListToolbar from '../components/account/AccountListToolbar';
+import EntityDialog from '../components/dialog/FormDialog';
 
 const AccountList = () => {
   const [selectedEntitiesIds, setSelectedEntitiesIds] = useState([]);
@@ -32,7 +33,7 @@ const AccountList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <AccountListToolbar selectedAccountsIds={selectedEntitiesIds} />
+          <AccountListToolbar selectedAccountIds={selectedEntitiesIds} />
           <Box sx={{ pt: 3 }}>
             <AccountListResults
               accounts={accountStore.accounts}
@@ -40,6 +41,7 @@ const AccountList = () => {
             />
           </Box>
         </Container>
+        <EntityDialog />
       </Box>
     </>
   );

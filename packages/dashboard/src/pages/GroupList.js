@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import GroupListToolbar from '../components/group/GroupListToolbar';
 import GroupListResults from '../components/group/GroupListResults';
 import { useStore } from '../store/store-context';
-import EntityDialog from '../components/dialog/EntityDialog';
+import EntityDialog from '../components/dialog/FormDialog';
 
 const GroupList = () => {
   const [selectedEntitiesIds, setSelectedEntitiesIds] = useState([]);
@@ -25,7 +25,6 @@ const GroupList = () => {
       <Helmet>
         <title>קבוצות</title>
       </Helmet>
-      <EntityDialog />
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -42,6 +41,7 @@ const GroupList = () => {
             />
           </Box>
         </Container>
+        <EntityDialog />
       </Box>
     </>
   );

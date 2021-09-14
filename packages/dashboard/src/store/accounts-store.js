@@ -1,12 +1,46 @@
 import { makeAutoObservable } from 'mobx';
 import { db } from '../firebase';
 
+export function createAccount({
+  id = null,
+  name,
+  email,
+  logo = '',
+  groups = [],
+  phone,
+  mobile,
+  type = 0,
+  address = {
+    city: '',
+    houseNumber: '',
+    street: ''
+  }
+}) {
+  return makeAutoObservable({
+    id,
+    name,
+    email,
+    logo,
+    groups,
+    phone,
+    mobile,
+    type,
+    address
+  });
+}
+
 export default function createAccountsStore() {
   const store = makeAutoObservable({
     accounts: new Map(),
     collectionName: 'accounts',
     state: 'pending',
     addAccount: (id, account) => {
+      store.accounts.set(id, createAccount(account));
+    },
+    deleteAccount: (id) => {
+      store.accounts.delete(id);
+    },
+    updateAccount: (id, account) => {
       store.accounts.set(id, account);
     },
     getAll: async () => {
@@ -53,8 +87,27 @@ export default function createAccountsStore() {
         throw Error(error);
       }
     },
-    update: async () => {},
-    delete: async () => {},
+    update: async (account) => {
+      try {
+        await db.collection(store.collectionName).doc(account.id).set({ ...account });
+        store.updateAccount(account.id, { ...store.accounts.get(account.id), ...account });
+      } catch (error) {
+        throw Error(error);
+      }
+    },
+    delete: async (accountsIds) => {
+      try {
+        const batch = db.batch();
+        accountsIds.forEach((id) => {
+          const docRef = db.collection(store.collectionName).doc(id);
+          return batch.delete(docRef);
+        });
+        await batch.commit();
+        accountsIds.forEach((id) => store.deleteAccount(id));
+      } catch (error) {
+        throw Error(error);
+      }
+    },
     setState: (newState) => {
       store.state = newState;
     }

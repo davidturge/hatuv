@@ -5,12 +5,10 @@ import { Formik } from 'formik';
 import {
   Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typography
 } from '@material-ui/core';
-import Account from '../models/account';
 import { useStore } from '../store/store-context';
-import { encrypt } from '../utils/encryption';
+import { encrypt } from '../utils/utils';
 import { ACCOUNT_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
-
-const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+// import { phoneRegex } from '../utils/formValidations';
 
 const AccountRegistration = () => {
   const navigate = useNavigate();
@@ -46,8 +44,8 @@ const AccountRegistration = () => {
               Yup.object().shape({
                 email: Yup.string().email(ACCOUNT_REGISTRATION_FORM_CONSTANTS.email.validation.error).max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.email.validation.required),
                 name: Yup.string().max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.name.validation.required),
-                phone: Yup.string().matches(phoneRegex, ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.required),
-                mobile: Yup.string().matches(phoneRegex, ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.validation.required),
+                // phone: Yup.string().matches(phoneRegex, ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.required),
+                // mobile: Yup.string().matches(phoneRegex, ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.validation.required),
                 city: Yup.string().required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.city.validation.required),
                 houseNumber: Yup.number().required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.houseNumber.validation.required),
                 street: Yup.string().required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.street.validation.required),
@@ -55,14 +53,14 @@ const AccountRegistration = () => {
               })
             }
             onSubmit={async (values) => {
-              const newAccount = new Account({
+              const newAccount = {
                 address: {
                   city: values.city,
                   houseNumber: values.houseNumber,
                   street: values.street
                 },
                 ...values
-              });
+              };
               const id = await accountStore.save(newAccount);
               navigate(`/register/${encrypt({ accountId: id, permission: 0 })}`);
             }}
@@ -122,7 +120,7 @@ const AccountRegistration = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   type="phone"
-                  value={values.password}
+                  value={values.phone}
                   variant="outlined"
                 />
                 <TextField
@@ -135,7 +133,7 @@ const AccountRegistration = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   type="phone"
-                  value={values.password}
+                  value={values.mobile}
                   variant="outlined"
                 />
                 <TextField
@@ -147,7 +145,7 @@ const AccountRegistration = () => {
                   name="city"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.password}
+                  value={values.city}
                   variant="outlined"
                 />
                 <TextField
@@ -159,7 +157,7 @@ const AccountRegistration = () => {
                   name="houseNumber"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.password}
+                  value={values.houseNumber}
                   variant="outlined"
                 />
                 <TextField
@@ -171,7 +169,7 @@ const AccountRegistration = () => {
                   name="street"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.password}
+                  value={values.street}
                   variant="outlined"
                 />
                 <Box

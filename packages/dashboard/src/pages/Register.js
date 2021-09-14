@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import User, { PermissionEnum } from '../models/user';
 import { useAuth } from '../store/auth-context';
-import { decrypt } from '../utils/encryption';
+import { decrypt } from '../utils/utils';
 import { USER_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
 
 const Register = () => {
