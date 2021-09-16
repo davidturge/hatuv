@@ -5,7 +5,7 @@ export function createAccount({
   id = null,
   name,
   email,
-  logo = '',
+  logo = '/static/images/avatars/avatar_2.png',
   groups = [],
   phone,
   mobile,
@@ -74,16 +74,13 @@ export default function createAccountsStore() {
       }
     },
     save: async (account) => {
-      store.setState('pending');
       try {
         const ref = await db.collection(store.collectionName).doc();
         const newAccount = { ...account, id: ref.id };
         await db.collection(store.collectionName).doc(ref.id).set(newAccount);
         store.addAccount(ref.id, newAccount);
-        store.setState('done');
         return ref.id;
       } catch (error) {
-        store.setState('error');
         throw Error(error);
       }
     },

@@ -2,14 +2,10 @@ import { makeAutoObservable } from 'mobx';
 
 function creatUIStore() {
   const store = makeAutoObservable({
+    selectedEntities: [],
     modal: {
       open: false,
       body: null
-    },
-    snackbar: {
-      open: false,
-      message: null,
-      severity: null
     },
     dialog: {
       open: false,
@@ -37,18 +33,9 @@ function creatUIStore() {
     closeDialog: () => {
       store.dialog.open = false;
     },
-    showSnackbar: ({ severity = null, message = null }) => {
-      debugger;
-      if (!severity || !message) {
-        throw Error('must have severity & message initialized');
-      }
-      store.snackbar.open = true;
-      store.snackbar.message = message;
-      store.snackbar.severity = severity;
-    },
-    closeSnackbar: () => {
-      store.snackbar.open = false;
-    },
+    setSelectedEntities: (items) => {
+      store.selectedEntities = [...items];
+    }
   });
 
   return store;

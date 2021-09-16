@@ -1,14 +1,14 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
-import { useEffect, useState } from 'react';
-import { useStore } from '../store/store-context';
+import { Box, CircularProgress, Container } from '@material-ui/core';
+import React, { useEffect } from 'react';
+import { observer } from 'mobx-react';
 import AccountListResults from '../components/account/AccountListResults';
 import AccountListToolbar from '../components/account/AccountListToolbar';
-import EntityDialog from '../components/dialog/FormDialog';
+import { useStore } from '../store/store-context';
 
 const AccountList = () => {
-  const [selectedEntitiesIds, setSelectedEntitiesIds] = useState([]);
   const { accountStore } = useStore();
+  const { uiStore } = useStore();
 
   useEffect(() => {
     const getAccounts = async () => {
@@ -25,26 +25,37 @@ const AccountList = () => {
       <Helmet>
         <title>חשבונות</title>
       </Helmet>
-      <Box
-        sx={{
-          backgroundColor: 'background.default',
-          minHeight: '100%',
-          py: 3
-        }}
-      >
-        <Container maxWidth={false}>
-          <AccountListToolbar selectedAccountIds={selectedEntitiesIds} />
-          <Box sx={{ pt: 3 }}>
-            <AccountListResults
-              accounts={accountStore.accounts}
-              entitiesState={{ selectedEntitiesIds, setSelectedEntitiesIds }}
-            />
-          </Box>
-        </Container>
-        <EntityDialog />
-      </Box>
+      {
+          accountStore.state === 'done' ? (
+            <Box
+              sx={{
+                backgroundColor: 'background.default',
+                minHeight: '100%',
+                py: 3
+              }}
+            >
+              <Container maxWidth={false}>
+                <AccountListToolbar selectedEntities={uiStore.selectedEntities} />
+                <Box sx={{ pt: 3 }}>
+                  <AccountListResults accounts={accountStore.accounts} />
+                </Box>
+              </Container>
+            </Box>
+          ) : (
+            <Box style={{
+              display: 'flex',
+              height: '100%',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            >
+              <CircularProgress />
+            </Box>
+          )
+        }
     </>
   );
 };
 
-export default AccountList;
+export default observer(AccountList);

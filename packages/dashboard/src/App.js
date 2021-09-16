@@ -20,8 +20,8 @@ const App = () => {
   return (
     <StylesProvider jss={jss}>
       <ThemeProvider theme={theme}>
-        <GlobalStyles />
         <StoreContextProvider>
+          <GlobalStyles />
           {routing}
         </StoreContextProvider>
       </ThemeProvider>
