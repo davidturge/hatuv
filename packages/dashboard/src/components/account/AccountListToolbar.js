@@ -58,7 +58,11 @@ const AccountListToolbar = ({
     const id = selectedEntities[0].id || null;
     showDialog({
       title: 'עדכון חשבון',
-      body: <AccountProfile1 id={id} showSnackbar={showSnackbar} closeDialog={closeDialog} />
+      body: <AccountProfile1
+        id={id}
+        showSnackbar={showSnackbar}
+        closeDialog={closeDialog}
+      />
     });
   };
 

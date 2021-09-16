@@ -8,7 +8,7 @@ import {
 import { makeStyles } from '@material-ui/styles';
 import Snackbar from '@material-ui/core/Snackbar';
 import Slide from '@material-ui/core/Slide';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@material-ui/core/Alert';
 import PropTypes from 'prop-types';
 
 const useStyles = makeStyles(() => ({

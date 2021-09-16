@@ -9,11 +9,15 @@ import { phone } from '../../utils/formValidations';
 
 const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
   const { accountStore } = useStore();
+  const { uiStore } = useStore();
   const initialAccountValue = {
     name: '',
     email: '',
     phone: '',
-    mobile: ''
+    mobile: '',
+    city: '',
+    street: '',
+    houseNumber: ''
   };
   const account = id ? {
     ...accountStore.accounts.get(id),
@@ -62,6 +66,7 @@ const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
           accountStore.save(newAccount);
           showSnackbar({ severity: 'success', message: 'חשבון נוסף בהצלחה' });
         }
+        uiStore.setSelectedEntities([]);
         closeDialog();
       } catch (error) {
         showSnackbar({ severity: 'error', message: error.message });
