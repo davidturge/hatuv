@@ -1,8 +1,26 @@
-export const GENERAL_GRID_CONSTANTS = {
+export const GENERAL_GRID_OPTIONS = {
+  enableRtl: true,
+  suppressRowClickSelection: true,
+  rowSelection: 'multiple',
+  rowHeight: 60,
   overlayMessage: 'טעינה...'
 };
 
-export const ACCOUNT_COLUMN_DEFS = [
+export const GRID_DEFAULT_DEFS = {
+  sortable: true,
+  flex: 1,
+  minWidth: 100,
+  resizable: true,
+  columnsMenuParams: {
+    suppressSyncLayoutWithGrid: true
+  },
+  cellStyle: {
+    display: 'flex',
+    alignItems: 'center'
+  }
+};
+
+export const GRID_ACCOUNT_COLUMN_DEFS = [
   {
     field: 'logo',
     headerName: '',
@@ -33,7 +51,7 @@ export const ACCOUNT_COLUMN_DEFS = [
   }
 ];
 
-export const USER_COLUMN_DEFS = (onActiveChanged) => [
+export const GRID_USER_COLUMN_DEFS = (onActiveChanged) => [
   {
     field: 'initials',
     headerName: '',

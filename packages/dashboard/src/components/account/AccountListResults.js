@@ -8,8 +8,8 @@ import {
 import { Search as SearchIcon } from 'react-feather';
 import { AvatarImageCell } from '../cells/AvatarCell';
 import { useStore } from '../../store/store-context';
-import { ACCOUNT_COLUMN_DEFS } from '../../constants/grids';
 import useWindowResize from '../../hooks/useWindowResize';
+import { GENERAL_GRID_OPTIONS, GRID_ACCOUNT_COLUMN_DEFS, GRID_DEFAULT_DEFS } from '../../constants/grids';
 
 const AccountListResults = ({ accounts }) => {
   const [gridApi, setGridApi] = useState(null);
@@ -49,26 +49,10 @@ const AccountListResults = ({ accounts }) => {
   };
 
   const gridOptions = {
-    enableRtl: true,
-    suppressRowClickSelection: true,
-    rowSelection: 'multiple',
-    rowHeight: 60,
-    defaultColDef: {
-      sortable: true,
-      flex: 1,
-      minWidth: 100,
-      resizable: true,
-      columnsMenuParams: {
-        suppressSyncLayoutWithGrid: true
-      },
-      cellStyle: {
-        display: 'flex',
-        alignItems: 'center'
-      }
-    },
-    overlayLoadingTemplate: 'טעינה ...',
+    ...GENERAL_GRID_OPTIONS,
+    defaultColDef: GRID_DEFAULT_DEFS,
     onGridSizeChanged,
-    columnDefs: ACCOUNT_COLUMN_DEFS
+    columnDefs: GRID_ACCOUNT_COLUMN_DEFS
   };
 
   return (

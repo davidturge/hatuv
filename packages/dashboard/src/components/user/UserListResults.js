@@ -11,7 +11,7 @@ import { getInitials } from '../../utils/utils';
 import { AvatarLetterCell } from '../cells/AvatarCell';
 import SwitchCell from '../cells/SwitchCell';
 import useWindowResize from '../../hooks/useWindowResize';
-import { USER_COLUMN_DEFS } from '../../constants/grids';
+import { GENERAL_GRID_OPTIONS, GRID_DEFAULT_DEFS, GRID_USER_COLUMN_DEFS } from '../../constants/grids';
 
 const UserListResults = ({ users }) => {
   const [gridApi, setGridApi] = useState(null);
@@ -52,25 +52,10 @@ const UserListResults = ({ users }) => {
   };
 
   const gridOptions = {
-    enableRtl: true,
-    suppressRowClickSelection: true,
-    rowSelection: 'multiple',
-    rowHeight: 60,
-    defaultColDef: {
-      sortable: true,
-      flex: 1,
-      minWidth: 100,
-      resizable: true,
-      columnsMenuParams: {
-        suppressSyncLayoutWithGrid: true
-      },
-      cellStyle: {
-        display: 'flex',
-        alignItems: 'center'
-      }
-    },
+    ...GENERAL_GRID_OPTIONS,
+    defaultColDef: GRID_DEFAULT_DEFS,
     onGridSizeChanged,
-    columnDefs: USER_COLUMN_DEFS(onActiveChanged)
+    columnDefs: GRID_USER_COLUMN_DEFS(onActiveChanged)
   };
 
   return (
