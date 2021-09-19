@@ -9,13 +9,16 @@ import Register from 'src/pages/Register';
 import Settings from 'src/pages/Settings';
 import GroupList from './pages/GroupList';
 import AccountList from './pages/AccountList';
+import UserList from './pages/UserList';
 import AccountRegistration from './pages/AccountRegistration';
 import { PermissionEnum } from './models/user';
-//
+// import PermissionDenied from './pages/PermissionDenied';
+
 const superUserRoutes = [
   { path: 'account', element: <Account /> },
   { path: 'dashboard', element: <Dashboard /> },
   { path: 'accounts', element: <AccountList /> },
+  { path: 'users', element: <UserList /> },
   { path: 'groups', element: <GroupList /> },
   { path: 'settings', element: <Settings /> },
 ];
@@ -57,6 +60,7 @@ const routes = (currentUser) => {
         { path: 'register/:uid', element: <Register /> },
         { path: 'register', element: <AccountRegistration /> },
         { path: '404', element: <NotFound /> },
+        // { path: 'unauthorized', element: <PermissionDenied /> },
         { path: '/', element: <Navigate to="/admin/dashboard" /> },
         { path: '*', element: <Navigate to="/404" /> }
       ]

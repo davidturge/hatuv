@@ -1,4 +1,4 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -6,13 +6,50 @@ import {
   Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typography
 } from '@material-ui/core';
 import { useStore } from '../store/store-context';
-import { encrypt } from '../utils/utils';
-import { ACCOUNT_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
-// import { phoneRegex } from '../utils/formValidations';
+// import { encrypt } from '../utils/utils';
+import { ACCOUNT_REGISTRATION_FORM_CONSTANTS, USER_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
+import { passwordStrength, phone } from '../utils/formValidations';
+// import FileUploader from '../components/FileUploader';
 
 const AccountRegistration = () => {
-  const navigate = useNavigate();
   const { accountStore } = useStore();
+  // const [, setSelectedFile] = useState(null);
+
+  const separateData = (data) => {
+    const adminProps = {
+      email: 'email',
+      firstName: 'firstName',
+      lastName: 'lastName',
+      password: 'password'
+    };
+
+    return Object.entries(data).reduce((res, [key, value]) => {
+      // eslint-disable-next-line no-prototype-builtins
+      if (adminProps.hasOwnProperty(key)) {
+        if (key === 'email') {
+          res.accountData.email = value;
+        }
+        res.userData[key] = value;
+      } else if (key === 'companyName') {
+        res.accountData.name = value;
+      } else {
+        res.accountData[key] = value;
+      }
+      return res;
+    }, {
+      userData: {},
+      accountData: {}
+    });
+  };
+
+  // const getAccountWithAddressObject = (account) => ({
+  //   address: {
+  //     city: account.city,
+  //     houseNumber: account.houseNumber,
+  //     street: account.street
+  //   },
+  //   ...account
+  // });
 
   return (
     <>
@@ -24,45 +61,45 @@ const AccountRegistration = () => {
           backgroundColor: 'background.default',
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          minHeight: '100%',
           justifyContent: 'center'
         }}
       >
         <Container maxWidth="sm">
           <Formik
             initialValues={{
-              email: '',
-              name: '',
+              companyEmail: '',
+              companyName: '',
               phone: '',
-              mobile: '',
-              city: '',
-              houseNumber: '',
-              street: '',
+              email: '',
+              firstName: '',
+              lastName: '',
+              password: '',
+              confirmPassword: '',
               policy: false
             }}
             validationSchema={
               Yup.object().shape({
-                email: Yup.string().email(ACCOUNT_REGISTRATION_FORM_CONSTANTS.email.validation.error).max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.email.validation.required),
-                name: Yup.string().max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.name.validation.required),
-                // phone: Yup.string().matches(phoneRegex, ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.required),
-                // mobile: Yup.string().matches(phoneRegex, ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.validation.required),
-                city: Yup.string().required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.city.validation.required),
-                houseNumber: Yup.number().required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.houseNumber.validation.required),
-                street: Yup.string().required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.street.validation.required),
+                companyName: Yup.string().max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyName.validation.required),
+                phone: Yup.string().matches(phone, ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.required),
+                email: Yup.string().email(USER_REGISTRATION_FORM_CONSTANTS.email.validation.required).max(255).required(USER_REGISTRATION_FORM_CONSTANTS.email.validation.required),
+                firstName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.firstName.validation.required),
+                lastName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.lastName.validation.required),
+                password: Yup.string().matches(passwordStrength, USER_REGISTRATION_FORM_CONSTANTS.password.validation.error)
+                  .required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required),
+                confirmPassword: Yup.string().required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required).when('password', {
+                  is: (val) => (!!(val && val.length > 0)),
+                  then: Yup.string().oneOf(
+                    [Yup.ref('password')],
+                    USER_REGISTRATION_FORM_CONSTANTS.confirmPassword.validation.error
+                  )
+                }),
                 policy: Yup.boolean().oneOf([true], 'נא לאשר את התקנון בבקשה')
               })
             }
             onSubmit={async (values) => {
-              const newAccount = {
-                address: {
-                  city: values.city,
-                  houseNumber: values.houseNumber,
-                  street: values.street
-                },
-                ...values
-              };
-              const id = await accountStore.save(newAccount);
-              navigate(`/register/${encrypt({ accountId: id, permission: 0 })}`);
+              const { accountData, userData } = separateData(values);
+              await accountStore.save(accountData, userData);
             }}
             enableReinitialize
           >
@@ -84,94 +121,104 @@ const AccountRegistration = () => {
                     צור חשבון חדש
                   </Typography>
                 </Box>
-                <TextField
-                  error={Boolean(touched.name && errors.name)}
-                  fullWidth
-                  helperText={touched.name && errors.name}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.name.placeholder}
-                  margin="normal"
-                  name="name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  dir="rtl"
-                  value={values.name}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.email && errors.email)}
-                  fullWidth
-                  helperText={touched.email && errors.email}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.email.placeholder}
-                  margin="normal"
-                  name="email"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="email"
-                  value={values.email}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.phone && errors.phone)}
-                  fullWidth
-                  helperText={touched.phone && errors.phone}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.placeholder}
-                  margin="normal"
-                  name="phone"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="phone"
-                  value={values.phone}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.mobile && errors.mobile)}
-                  fullWidth
-                  helperText={touched.mobile && errors.mobile}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.mobile.placeholder}
-                  margin="normal"
-                  name="mobile"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="phone"
-                  value={values.mobile}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.city && errors.city)}
-                  fullWidth
-                  helperText={touched.city && errors.city}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.city.placeholder}
-                  margin="normal"
-                  name="city"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.city}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.houseNumber && errors.houseNumber)}
-                  fullWidth
-                  helperText={touched.houseNumber && errors.houseNumber}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.houseNumber.placeholder}
-                  margin="normal"
-                  name="houseNumber"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.houseNumber}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(touched.street && errors.street)}
-                  fullWidth
-                  helperText={touched.street && errors.street}
-                  placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.street.placeholder}
-                  margin="normal"
-                  name="street"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.street}
-                  variant="outlined"
-                />
+                <Box>
+                  <TextField
+                    error={Boolean(touched.companyName && errors.companyName)}
+                    fullWidth
+                    helperText={touched.companyName && errors.companyName}
+                    placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyName.placeholder}
+                    margin="normal"
+                    name="companyName"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    dir="rtl"
+                    value={values.companyName}
+                    variant="outlined"
+                  />
+                  <TextField
+                    error={Boolean(touched.firstName && errors.firstName)}
+                    fullWidth
+                    helperText={touched.firstName && errors.firstName}
+                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.firstName.placeholder}
+                    margin="normal"
+                    name="firstName"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    dir="rtl"
+                    value={values.firstName}
+                    variant="outlined"
+                  />
+                  <TextField
+                    error={Boolean(touched.lastName && errors.lastName)}
+                    fullWidth
+                    helperText={touched.lastName && errors.lastName}
+                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.lastName.placeholder}
+                    margin="normal"
+                    name="lastName"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    dir="rtl"
+                    value={values.lastName}
+                    variant="outlined"
+                  />
+                  <TextField
+                    error={Boolean(touched.phone && errors.phone)}
+                    fullWidth
+                    helperText={touched.phone && errors.phone}
+                    placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.placeholder}
+                    margin="normal"
+                    name="phone"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="phone"
+                    value={values.phone}
+                    variant="outlined"
+                  />
+
+                  <TextField
+                    error={Boolean(touched.email && errors.email)}
+                    fullWidth
+                    helperText={touched.email && errors.email}
+                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.email.placeholder}
+                    margin="normal"
+                    name="email"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="email"
+                    value={values.email}
+                    variant="outlined"
+                  />
+                  <TextField
+                    error={Boolean(touched.password && errors.password)}
+                    fullWidth
+                    helperText={touched.password && errors.password}
+                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.password.placeholder}
+                    margin="normal"
+                    name="password"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="password"
+                    value={values.password}
+                    variant="outlined"
+                  />
+                  <TextField
+                    error={Boolean(touched.confirmPassword && errors.confirmPassword)}
+                    fullWidth
+                    helperText={touched.confirmPassword && errors.confirmPassword}
+                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.confirmPassword.placeholder}
+                    margin="normal"
+                    name="confirmPassword"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="password"
+                    value={values.confirmPassword}
+                    variant="outlined"
+                  />
+                  {/* <FileUploader */}
+                  {/*  onFileSelectSuccess={(file) => setSelectedFile(file)} */}
+                  {/*  onFileSelectError={({ error }) => alert(error)} */}
+                  {/* /> */}
+                </Box>
                 <Box
                   sx={{
                     alignItems: 'center',

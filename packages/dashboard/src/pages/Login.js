@@ -1,4 +1,4 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -14,7 +14,7 @@ import { useAuth } from '../store/auth-context';
 
 const Login = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <>
@@ -40,10 +40,9 @@ const Login = () => {
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
               password: Yup.string().max(255).required('Password is required')
             })}
-            onSubmit={(values) => {
+            onSubmit={async (values) => {
               const { email, password } = values;
-              login(email, password);
-              navigate('/admin/dashboard');
+              await login(email, password);
             }}
           >
             {({
@@ -68,7 +67,7 @@ const Login = () => {
                   error={Boolean(touched.email && errors.email)}
                   fullWidth
                   helperText={touched.email && errors.email}
-                  placeholder="כתובת מייל"
+                  placeholder='דוא"ל'
                   margin="normal"
                   name="email"
                   onBlur={handleBlur}

@@ -1,4 +1,6 @@
 import { createStyles, makeStyles } from '@material-ui/styles';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 const useStyles = makeStyles(() => createStyles({
   '@global': {

@@ -8,7 +8,6 @@ import { create } from 'jss';
 import { jssPreset, StylesProvider } from '@material-ui/styles';
 import theme from 'src/theme';
 import routes from 'src/routes';
-import { StoreContextProvider } from './store/store-context';
 import { useAuth } from './store/auth-context';
 
 const jss = create({ plugins: [...jssPreset().plugins, rtl()] });
@@ -20,10 +19,8 @@ const App = () => {
   return (
     <StylesProvider jss={jss}>
       <ThemeProvider theme={theme}>
-        <StoreContextProvider>
-          <GlobalStyles />
-          {routing}
-        </StoreContextProvider>
+        <GlobalStyles />
+        {routing}
       </ThemeProvider>
     </StylesProvider>
   );

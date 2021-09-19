@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import createAccountsStore from './accounts-store';
-import createUsersStore from './users-store';
+import createAccountStore from './account-store';
+import createUserStore from './users-store';
 import creatGroupStore from './groups-store';
 import creatUIStore from './ui-store';
 
@@ -13,8 +13,8 @@ export function useStore() {
 
 export function StoreContextProvider({ children }) {
   const [uiStore] = useState(() => creatUIStore());
-  const [accountStore] = useState(() => createAccountsStore());
-  const [userStore] = useState(() => createUsersStore());
+  const [userStore] = useState(() => createUserStore());
+  const [accountStore] = useState(() => createAccountStore(userStore));
   const [groupStore] = useState(() => creatGroupStore());
 
   const value = {

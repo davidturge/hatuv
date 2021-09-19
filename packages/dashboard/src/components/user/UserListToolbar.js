@@ -2,38 +2,43 @@ import { Box, Button } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { observer } from 'mobx-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/store-context';
-import AccountProfile1 from './AccountProfile1';
 import withDashboardActions from '../../hoc/withDashboardActions';
-import { ACCOUNT_ACTIONS_MESSAGES_CONSTANTS } from '../../constants/forms';
+import UserProfile from './UserProfile';
+import { encrypt } from '../../utils/utils';
+import { useAuth } from '../../store/auth-context';
+import { USER_ACTIONS_MESSAGES_CONSTANTS } from '../../constants/forms';
 
-const AccountListToolbar = ({
+const UserListToolbar = ({
   selectedEntities,
   showSnackbar,
   showDialog,
   closeDialog,
   ...rest
 }) => {
-  const { accountStore } = useStore();
+  const { userStore } = useStore();
   const { uiStore } = useStore();
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   const removeAccount = async () => {
     try {
-      await accountStore.delete(selectedEntities.map((item) => item.id));
+      await userStore.delete(selectedEntities.map((item) => item.id));
       showSnackbar({
         severity: 'success',
-        message: ACCOUNT_ACTIONS_MESSAGES_CONSTANTS.success.delete
+        message: USER_ACTIONS_MESSAGES_CONSTANTS.success.delete
       });
     } catch (error) {
       showSnackbar({
-        severity: 'error',
+        severity: 'success',
         message: 'לא ניתן לבצע את פעולת המחיקה'
       });
     }
     uiStore.setSelectedEntities([]);
   };
 
-  const onRemoveAccountsClicked = () => {
+  const onRemoveUsersClicked = () => {
     const title = 'מחק חשבון';
     let bodyMessage = 'אתה בטוח שאתה מעוניין למחוק את החשבון?';
     if (selectedEntities.length > 1) {
@@ -46,26 +51,30 @@ const AccountListToolbar = ({
     });
   };
 
-  const onAddAccountsClicked = () => {
+  // const onAddUsersClicked = () => {
+  //   showDialog({
+  //     title: 'יצירת חשבון',
+  //     body: <UserProfile
+  //       showSnackbar={showSnackbar}
+  //       closeDialog={closeDialog}
+  //     />
+  //   });
+  // };
+
+  const onUpdateUsersClicked = () => {
+    const id = selectedEntities[0].id || null;
     showDialog({
-      title: 'יצירת חשבון',
-      body: <AccountProfile1
+      title: 'עדכון חשבון',
+      body: <UserProfile
+        id={id}
         showSnackbar={showSnackbar}
         closeDialog={closeDialog}
       />
     });
   };
 
-  const onUpdateAccountsClicked = () => {
-    const id = selectedEntities[0].id || null;
-    showDialog({
-      title: 'עדכון חשבון',
-      body: <AccountProfile1
-        id={id}
-        showSnackbar={showSnackbar}
-        closeDialog={closeDialog}
-      />
-    });
+  const onGenerateUserRegisterLink = () => {
+    navigate(`/register/${encrypt(/**/{ accountId: currentUser.accountId, permission: 2 })}`);
   };
 
   return (
@@ -80,16 +89,8 @@ const AccountListToolbar = ({
           <Button
             color="primary"
             variant="contained"
-            disabled={selectedEntities.length > 0}
-            onClick={onAddAccountsClicked}
-          >
-            הוסף
-          </Button>
-          <Button
-            color="primary"
-            variant="contained"
             disabled={selectedEntities.length === 0}
-            onClick={onRemoveAccountsClicked}
+            onClick={onRemoveUsersClicked}
           >
             הסר
           </Button>
@@ -97,9 +98,16 @@ const AccountListToolbar = ({
             color="primary"
             variant="contained"
             disabled={selectedEntities.length > 1 || selectedEntities.length === 0}
-            onClick={onUpdateAccountsClicked}
+            onClick={onUpdateUsersClicked}
           >
             עדכן
+          </Button>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={onGenerateUserRegisterLink}
+          >
+            שלח בקשה ליצירת משתמש
           </Button>
         </Box>
       </Box>
@@ -108,10 +116,10 @@ const AccountListToolbar = ({
   );
 };
 
-AccountListToolbar.propTypes = {
+UserListToolbar.propTypes = {
   selectedEntities: PropTypes.array,
   showSnackbar: PropTypes.func,
   showDialog: PropTypes.func,
   closeDialog: PropTypes.func
 };
-export default observer(withDashboardActions(AccountListToolbar));
+export default observer(withDashboardActions(UserListToolbar));

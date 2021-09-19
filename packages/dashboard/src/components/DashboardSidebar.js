@@ -19,9 +19,6 @@ import NavItem from './NavItem';
 import { useAuth } from '../store/auth-context';
 import { PermissionEnum } from '../models/user';
 
-const user = {
-  avatar: '/static/images/avatars/hatuv.jpeg',
-};
 const getSidebarItems = (permissionsType) => [
   {
     href: '/admin/dashboard',
@@ -44,6 +41,12 @@ const getSidebarItems = (permissionsType) => [
     icon: UserIcon,
     title: 'חשבונות',
     hide: permissionsType !== PermissionEnum.SUPER_USER
+  },
+  {
+    href: '/admin/users',
+    icon: UserIcon,
+    title: 'משתמשים',
+    hide: permissionsType > PermissionEnum.ACCOUNT_ADMIN
   },
   {
     href: '/admin/settings',
@@ -82,19 +85,21 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
       >
         <Avatar
           component={RouterLink}
-          src={user.avatar}
+          src={currentUser.avatar}
           sx={{
             cursor: 'pointer',
             width: 64,
             height: 64
           }}
           to="/admin/account"
-        />
+        >
+          {/* {getInitials(`${currentUser.firstName} ${currentUser.lastName}`)} */}
+        </Avatar>
         <Typography
           color="textPrimary"
           variant="h5"
         >
-          {currentUser.name}
+          {`${currentUser.firstName} ${currentUser.lastName}`}
         </Typography>
       </Box>
       <Divider />

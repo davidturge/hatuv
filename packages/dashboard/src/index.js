@@ -3,12 +3,15 @@ import { BrowserRouter } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
 import { AuthContextProvider } from './store/auth-context';
+import { StoreContextProvider } from './store/store-context';
 
 ReactDOM.render((
   <BrowserRouter>
-    <AuthContextProvider>
-      <App />
-    </AuthContextProvider>
+    <StoreContextProvider>
+      <AuthContextProvider>
+        <App />
+      </AuthContextProvider>
+    </StoreContextProvider>
   </BrowserRouter>
 ), document.getElementById('root'));
 

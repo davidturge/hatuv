@@ -2,31 +2,31 @@ import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
-import AccountListResults from '../components/account/AccountListResults';
-import AccountListToolbar from '../components/account/AccountListToolbar';
 import { useStore } from '../store/store-context';
+import UserListToolbar from '../components/user/UserListToolbar';
+import UserListResults from '../components/user/UserListResults';
 import { useAuth } from '../store/auth-context';
 
-const AccountList = () => {
-  const { accountStore } = useStore();
-  const { uiStore } = useStore();
+const UserList = () => {
+  const { userStore } = useStore();
   const { currentUser } = useAuth();
+  const { uiStore } = useStore();
 
   useEffect(() => {
-    const getAccounts = async () => {
-      await accountStore.getAll(currentUser.id);
+    const getUsers = async () => {
+      await userStore.getByAccountId(currentUser.id, currentUser.accountId);
     };
-    getAccounts();
+    getUsers();
     return () => {
       uiStore.setSelectedEntities([]);
-      accountStore.setState('pending');
+      userStore.setState('pending');
     };
   }, []);
 
   return (
     <>
       <Helmet>
-        <title>חשבונות</title>
+        <title>משתמשים</title>
       </Helmet>
       <Box
         sx={{
@@ -36,9 +36,9 @@ const AccountList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <AccountListToolbar selectedEntities={uiStore.selectedEntities} />
+          <UserListToolbar selectedEntities={uiStore.selectedEntities} />
           <Box sx={{ pt: 3 }}>
-            <AccountListResults accounts={accountStore.accounts} />
+            <UserListResults users={userStore.users} />
           </Box>
         </Container>
       </Box>
@@ -46,4 +46,4 @@ const AccountList = () => {
   );
 };
 
-export default observer(AccountList);
+export default observer(UserList);

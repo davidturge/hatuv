@@ -1,161 +1,91 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { observer } from 'mobx-react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  Box, Button, Container, Link, Snackbar, TextField, Typography
-} from '@material-ui/core';
-import { Formik } from 'formik';
+import { Box, Button, TextField } from '@material-ui/core';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Link as RouterLink } from 'react-router-dom';
-import User from '../../models/user';
-import StoreContext from '../../store/store-context';
+import PropTypes from 'prop-types';
+import { observer } from 'mobx-react';
+import { useStore } from '../../store/store-context';
+import { USER_ACTIONS_MESSAGES_CONSTANTS, USER_REGISTRATION_FORM_CONSTANTS } from '../../constants/forms';
 
-const UserProfile = ({ id = null }) => {
-  const { userStore } = useContext(StoreContext);
-  const [user, setUser] = useState(new User({}));
-  const [snackbarProps, setSnackbarProps] = useState({
-    open: false,
-    severity: '',
-    message: ''
+const UserProfile = ({ id, closeDialog, showSnackbar }) => {
+  const { userStore } = useStore();
+  const { uiStore } = useStore();
+  const user = userStore.users.get(id);
+
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.firstName.validation.required),
+    lastName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.lastName.validation.required),
   });
 
-  useEffect(() => {
-    if (id) {
-      const getUser = async () => {
-        try {
-          const currUser = await userStore.getById(id);
-          setUser(currUser);
-        } catch (e) {
-          setSnackbarProps({ open: true, severity: 'error', message: 'unable tp load user data' });
-        }
-      };
-      getUser();
-    } else {
-      userStore.setState('success');
+  const formik = useFormik({
+    initialValues: user,
+    validationSchema,
+    onSubmit: async (userData) => {
+      try {
+        await userStore.update(userData);
+        showSnackbar({ severity: 'success', message: USER_ACTIONS_MESSAGES_CONSTANTS.success.update });
+        uiStore.setSelectedEntities([]);
+        closeDialog();
+      } catch (error) {
+        showSnackbar({ severity: 'error', message: error.message });
+        throw Error(error);
+      }
     }
-  }, []);
+  });
 
-  const handleClose = () => {
-    setSnackbarProps({ open: false });
+  const handleCloseDialog = () => {
+    closeDialog();
   };
 
   return (
     <>
-      {
-        userStore.state === 'success'
-        && (
-        <>
-          <Box
-            sx={{
-              backgroundColor: 'background.default',
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              justifyContent: 'center'
-            }}
-          >
-            <Container maxWidth="sm">
-              <Formik
-                initialValues={{
-                  email: user.email,
-                  password: user.password
-                }}
-                validationSchema={Yup.object().shape({
-                  email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                  password: Yup.string().max(255).required('Password is required')
-                })}
-                onSubmit={(values) => {
-                  console.log(values);
-                }}
-                enableReinitialize
-              >
-                {({
-                  errors,
-                  handleBlur,
-                  handleChange,
-                  handleSubmit,
-                  isSubmitting,
-                  touched,
-                  values
-                }) => (
-                  <form onSubmit={handleSubmit}>
-                    <Box sx={{ mb: 3 }}>
-                      <Typography
-                        color="textPrimary"
-                        variant="h2"
-                      >
-                        יצירת משתמש
-                      </Typography>
-                    </Box>
-                    <TextField
-                      error={Boolean(touched.email && errors.email)}
-                      fullWidth
-                      helperText={touched.email && errors.email}
-                      placeholder="כתובת מייל"
-                      margin="normal"
-                      name="email"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      type="email"
-                      value={values.email}
-                      variant="outlined"
-                    />
-                    <TextField
-                      error={Boolean(touched.password && errors.password)}
-                      fullWidth
-                      helperText={touched.password && errors.password}
-                      placeholder="סיסמא"
-                      margin="normal"
-                      name="password"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      type="password"
-                      value={values.password}
-                      variant="outlined"
-                    />
-                    <Box sx={{ py: 2 }}>
-                      <Button
-                        color="primary"
-                        disabled={isSubmitting}
-                        fullWidth
-                        size="large"
-                        type="submit"
-                        variant="contained"
-                      >
-                        התחבר
-                      </Button>
-                    </Box>
-                    <Typography
-                      color="textSecondary"
-                      variant="body1"
-                    >
-                      {' '}
-                      <Link
-                        component={RouterLink}
-                        to="/register"
-                        variant="h6"
-                      />
-                    </Typography>
-                  </form>
-                )}
-              </Formik>
-            </Container>
-          </Box>
-        </>
-        )
-      }
-      <Snackbar open={snackbarProps.open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity={snackbarProps.severity}>
-          {snackbarProps.message}
-        </Alert>
-      </Snackbar>
+      <Box>
+        <form onSubmit={formik.handleSubmit}>
+          <TextField
+            margin="normal"
+            fullWidth
+            id="firstName"
+            name="firstName"
+            value={formik.values.firstName}
+            placeholder={USER_REGISTRATION_FORM_CONSTANTS.firstName.placeholder}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+            helperText={formik.touched.firstName && formik.errors.firstName}
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            id="lastName"
+            name="lastName"
+            value={formik.values.lastName}
+            placeholder={USER_REGISTRATION_FORM_CONSTANTS.lastName.placeholder}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+            helperText={formik.touched.lastName && formik.errors.lastName}
+          />
+          <Button color="primary" variant="contained" type="submit">
+            שמור
+          </Button>
+          <Button color="primary" variant="contained" onClick={handleCloseDialog}>
+            בטל
+          </Button>
+        </form>
+      </Box>
     </>
   );
 };
 
 UserProfile.propTypes = {
-  id: PropTypes.string
+  id: PropTypes.string,
+  closeDialog: PropTypes.func,
+  showSnackbar: PropTypes.func
+};
+
+UserProfile.defaultProps = {
+  id: null,
+  closeDialog: null,
+  showSnackbar: null
 };
 
 export default observer(UserProfile);

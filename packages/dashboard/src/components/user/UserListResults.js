@@ -6,30 +6,29 @@ import {
   Box, Card, CardContent, InputAdornment, SvgIcon, TextField
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
-import { AvatarImageCell } from '../cells/AvatarCell';
 import { useStore } from '../../store/store-context';
-import { ACCOUNT_COLUMN_DEFS } from '../../constants/grids';
+import { getInitials } from '../../utils/utils';
+import { AvatarLetterCell } from '../cells/AvatarCell';
+import SwitchCell from '../cells/SwitchCell';
 import useWindowResize from '../../hooks/useWindowResize';
+import { USER_COLUMN_DEFS } from '../../constants/grids';
 
-const AccountListResults = ({ accounts }) => {
+const UserListResults = ({ users }) => {
   const [gridApi, setGridApi] = useState(null);
-  const { uiStore } = useStore();
+  const { uiStore, userStore } = useStore();
   const { height } = useWindowResize(292);
 
-  const rowData = Array.from(accounts, ([, value]) => ({
+  const rowData = Array.from(users, ([, value]) => ({
+    initials: getInitials(`${value.firstName} ${value.lastName}`),
     groupsCount: value.groups.length,
     ...value
   }));
 
-  if (rowData.length > 0 && gridApi) {
-    gridApi.hideOverlay();
-  }
-
   const onGridSizeChanged = (data) => {
     if (data.clientWidth < 700) {
-      data.columnApi.setColumnsVisible(['phone', 'groupsCount'], false);
+      data.columnApi.setColumnsVisible(['email', 'groupsCount', 'active'], false);
     } else {
-      data.columnApi.setColumnsVisible(['phone', 'groupsCount'], true);
+      data.columnApi.setColumnsVisible(['email', 'groupsCount', 'active'], true);
     }
   };
 
@@ -46,6 +45,10 @@ const AccountListResults = ({ accounts }) => {
     const nodes = gridApi.getSelectedNodes();
     const data = nodes.map((node) => node.data);
     uiStore.setSelectedEntities(data);
+  };
+
+  const onActiveChanged = (data, isActive) => {
+    userStore.update({ ...data, active: isActive });
   };
 
   const gridOptions = {
@@ -66,9 +69,8 @@ const AccountListResults = ({ accounts }) => {
         alignItems: 'center'
       }
     },
-    overlayLoadingTemplate: 'טעינה ...',
     onGridSizeChanged,
-    columnDefs: ACCOUNT_COLUMN_DEFS
+    columnDefs: USER_COLUMN_DEFS(onActiveChanged)
   };
 
   return (
@@ -106,7 +108,8 @@ const AccountListResults = ({ accounts }) => {
           gridOptions={gridOptions}
           onRowSelected={onRowSelected}
           frameworkComponents={{
-            avatarCellRenderer: AvatarImageCell
+            avatarCellRenderer: AvatarLetterCell,
+            switchCellRenderer: SwitchCell
           }}
         />
       </div>
@@ -114,12 +117,12 @@ const AccountListResults = ({ accounts }) => {
   );
 };
 
-AccountListResults.propTypes = {
-  accounts: PropTypes.object
+UserListResults.propTypes = {
+  users: PropTypes.object
 };
 
-AccountListResults.defaultProps = {
-  accounts: []
+UserListResults.defaultProps = {
+  users: {}
 };
 
-export default observer(AccountListResults);
+export default observer(UserListResults);

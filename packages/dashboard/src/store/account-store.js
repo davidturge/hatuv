@@ -1,20 +1,21 @@
 import { makeAutoObservable } from 'mobx';
 import { db } from '../firebase';
 
-export function createAccount({
+// const imageMetadata = {
+//   contentType: 'image/jpeg',
+//   cacheControl: 'public,max-age=2592000'
+// };
+
+function createAccount({
   id = null,
   name,
   email,
-  logo = '/static/images/avatars/avatar_2.png',
+  logo = null,
   groups = [],
-  phone,
-  mobile,
   type = 0,
-  address = {
-    city: '',
-    houseNumber: '',
-    street: ''
-  }
+  phone,
+  createdOn = new Date(),
+  updatedOn = new Date()
 }) {
   return makeAutoObservable({
     id,
@@ -23,25 +24,22 @@ export function createAccount({
     logo,
     groups,
     phone,
-    mobile,
     type,
-    address
+    createdOn,
+    updatedOn
   });
 }
 
-export default function createAccountsStore() {
+export default function createAccountStore(userStore) {
   const store = makeAutoObservable({
     accounts: new Map(),
     collectionName: 'accounts',
     state: 'pending',
-    addAccount: (id, account) => {
+    setAccount: (id, account) => {
       store.accounts.set(id, createAccount(account));
     },
     deleteAccount: (id) => {
       store.accounts.delete(id);
-    },
-    updateAccount: (id, account) => {
-      store.accounts.set(id, account);
     },
     getAll: async () => {
       store.setState('pending');
@@ -49,7 +47,9 @@ export default function createAccountsStore() {
         const usersCollectionRef = db.collection(store.collectionName);
         const snapshot = await usersCollectionRef.get();
         snapshot.forEach((doc) => {
-          store.addAccount(doc.id, doc.data());
+          // if (doc.id !== currUser.accountId) {
+          store.setAccount(doc.id, doc.data());
+          // }
         });
         store.setState('done');
         return store.accounts;
@@ -64,7 +64,7 @@ export default function createAccountsStore() {
         if (!store.accounts.has(id)) {
           const usersDocRef = db.collection(store.collectionName).doc(id);
           const doc = await usersDocRef.get();
-          store.addAccount(doc.id, doc.data());
+          store.setAccount(doc.id, doc.data());
         }
         store.setState('done');
         return store.accounts.get(id);
@@ -73,13 +73,18 @@ export default function createAccountsStore() {
         throw Error(error);
       }
     },
-    save: async (account) => {
+    save: async (account, user = null) => {
       try {
         const ref = await db.collection(store.collectionName).doc();
         const newAccount = { ...account, id: ref.id };
-        await db.collection(store.collectionName).doc(ref.id).set(newAccount);
-        store.addAccount(ref.id, newAccount);
-        return ref.id;
+        await db.collection(store.collectionName).doc(newAccount.id).set(newAccount);
+        // storage.child().put((account.file, { customMetadata: imageMetadata })).then((snapshot) => {
+        //   console.log('Uploaded a blob or file!');
+        // });
+        if (user) {
+          await userStore.signup({ user, accountId: newAccount.id, permission: 0 });
+        }
+        store.setAccount(ref.id, newAccount);
       } catch (error) {
         throw Error(error);
       }
@@ -87,7 +92,7 @@ export default function createAccountsStore() {
     update: async (account) => {
       try {
         await db.collection(store.collectionName).doc(account.id).set({ ...account });
-        store.updateAccount(account.id, { ...store.accounts.get(account.id), ...account });
+        store.setAccount(account.id, { ...store.accounts.get(account.id), ...account });
       } catch (error) {
         throw Error(error);
       }

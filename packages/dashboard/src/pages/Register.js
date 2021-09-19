@@ -7,14 +7,15 @@ import { Formik } from 'formik';
 import {
   Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typography
 } from '@material-ui/core';
-import User, { PermissionEnum } from '../models/user';
-import { useAuth } from '../store/auth-context';
+import { PermissionEnum } from '../models/user';
 import { decrypt } from '../utils/utils';
 import { USER_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
+import { passwordStrength } from '../utils/formValidations';
+import { useStore } from '../store/store-context';
 
 const Register = () => {
   const { uid } = useParams();
-  const { signup } = useAuth();
+  const { userStore } = useStore();
   const navigate = useNavigate();
 
   return (
@@ -27,7 +28,7 @@ const Register = () => {
           backgroundColor: 'background.default',
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          minHeight: '100%',
           justifyContent: 'center'
         }}
       >
@@ -38,6 +39,7 @@ const Register = () => {
               firstName: '',
               lastName: '',
               password: '',
+              confirmPassword: '',
               policy: false
             }}
             validationSchema={
@@ -46,17 +48,22 @@ const Register = () => {
                   .max(255).required(USER_REGISTRATION_FORM_CONSTANTS.email.validation.required),
                 firstName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.firstName.validation.required),
                 lastName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.lastName.validation.required),
-                password: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required),
+                password: Yup.string().matches(passwordStrength, USER_REGISTRATION_FORM_CONSTANTS.password.validation.error)
+                  .required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required),
+                confirmPassword: Yup.string().required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required).when('password', {
+                  is: (val) => (!!(val && val.length > 0)),
+                  then: Yup.string().oneOf(
+                    [Yup.ref('password')],
+                    USER_REGISTRATION_FORM_CONSTANTS.confirmPassword.validation.error
+                  )
+                }),
                 policy: Yup.boolean().oneOf([true], 'נא לאשר את התקנון בבקשה')
               })
             }
-            onSubmit={async (values) => {
+            onSubmit={async (user) => {
               const { accountId, permission = PermissionEnum.GROUP_ADMIN } = decrypt(uid);
-              const user = new User({
-                ...values, accountId, permission
-              });
               try {
-                await signup(user, values.password);
+                await userStore.signup({ user, accountId, permission });
                 navigate('/admin/dashboard');
               } catch (error) {
                 console.log(error);
@@ -132,6 +139,19 @@ const Register = () => {
                   onChange={handleChange}
                   type="password"
                   value={values.password}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.confirmPassword && errors.confirmPassword)}
+                  fullWidth
+                  helperText={touched.confirmPassword && errors.confirmPassword}
+                  placeholder={USER_REGISTRATION_FORM_CONSTANTS.confirmPassword.placeholder}
+                  margin="normal"
+                  name="confirmPassword"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="password"
+                  value={values.confirmPassword}
                   variant="outlined"
                 />
                 <Box

@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { db, auth } from '../firebase';
-import User from '../models/user';
+import { useStore } from './store-context';
 
 const collectionName = 'users';
 const AuthContext = React.createContext(null);
@@ -20,25 +21,27 @@ export function useAuth() {
 export function AuthContextProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { accountStore } = useStore();
 
-  /**
-   * Signup method get user object register the user to the firebase auth-service
-   * add new document for this user in the users collection
-   * accountId - mandatory
-   * @param newUser<User>
-   * @returns {Promise<void>}
-   */
-  async function signup(newUser = null, password) {
-    try {
-      const { user } = await auth.createUserWithEmailAndPassword(newUser.email, password);
-      if (user) {
-        await db.collection(collectionName).doc(user.uid).set({ ...newUser });
-      }
-    } catch (error) {
-      throw Error(error);
-    }
-  }
+  // /**
+  //  * Signup method get user object register the user to the firebase auth-service
+  //  * add new document for this user in the users collection
+  //  * accountId - mandatory
+  //  * @param newUser<User>
+  //  * @returns {Promise<void>}
+  //  */
+  // async function signup(newUser = null, password) {
+  //   try {
+  //     const { user } = await auth.createUserWithEmailAndPassword(newUser.email, password);
+  //     if (user) {
+  //       await db.collection(collectionName).doc(user.uid).set({ ...newUser });
+  //     }
+  //   } catch (error) {
+  //     throw Error(error);
+  //   }
+  // }
 
   /**
    * Login methode
@@ -79,13 +82,16 @@ export function AuthContextProvider({ children }) {
         db.collection(collectionName)
           .doc(user.uid)
           .get()
-          .then((docRef) => {
-            setCurrentUser(new User(docRef.data()));
+          .then(async (docRef) => {
+            const account = await accountStore.getById(docRef.data().accountId);
+            const currUser = { ...docRef.data(), account };
+            setCurrentUser(currUser);
             setLoading(false);
-            // navigate('/app/dashboard', { replace: true });
+            const path = (location.pathname !== '/login') ? location.pathname : '/admin/dashboard';
+            navigate(`/${path}`);
           })
           .catch((error) => {
-            console.log(error);
+            throw Error(error);
           });
       } else {
         setCurrentUser(user);
@@ -98,7 +104,6 @@ export function AuthContextProvider({ children }) {
   const value = {
     currentUser,
     login,
-    signup,
     logout
     // resetPassword,
     // updateEmail,
