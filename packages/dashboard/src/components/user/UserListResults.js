@@ -7,22 +7,20 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 import { useStore } from '../../store/store-context';
-import { getInitials } from '../../utils/utils';
+// import { getInitials } from '../../utils/utils';
 import { AvatarLetterCell } from '../cells/AvatarCell';
 import SwitchCell from '../cells/SwitchCell';
 import useWindowResize from '../../hooks/useWindowResize';
 import { GENERAL_GRID_OPTIONS, GRID_DEFAULT_DEFS, GRID_USER_COLUMN_DEFS } from '../../constants/grids';
 
-const UserListResults = ({ users }) => {
+const UserListResults = ({ rowData }) => {
   const [gridApi, setGridApi] = useState(null);
   const { uiStore, userStore } = useStore();
   const { height } = useWindowResize(292);
 
-  const rowData = Array.from(users, ([, value]) => ({
-    initials: getInitials(`${value.firstName} ${value.lastName}`),
-    groupsCount: value.groups.length,
-    ...value
-  }));
+  if (rowData && gridApi) {
+    gridApi.hideOverlay();
+  }
 
   const onGridSizeChanged = (data) => {
     if (data.clientWidth < 700) {
@@ -103,11 +101,11 @@ const UserListResults = ({ users }) => {
 };
 
 UserListResults.propTypes = {
-  users: PropTypes.object
+  rowData: PropTypes.array
 };
 
 UserListResults.defaultProps = {
-  users: {}
+  rowData: null
 };
 
 export default observer(UserListResults);

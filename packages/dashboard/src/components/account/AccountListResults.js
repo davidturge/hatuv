@@ -11,17 +11,12 @@ import { useStore } from '../../store/store-context';
 import useWindowResize from '../../hooks/useWindowResize';
 import { GENERAL_GRID_OPTIONS, GRID_ACCOUNT_COLUMN_DEFS, GRID_DEFAULT_DEFS } from '../../constants/grids';
 
-const AccountListResults = ({ accounts }) => {
+const AccountListResults = ({ rowData }) => {
   const [gridApi, setGridApi] = useState(null);
   const { uiStore } = useStore();
   const { height } = useWindowResize(292);
 
-  const rowData = Array.from(accounts, ([, value]) => ({
-    groupsCount: value.groups.length,
-    ...value
-  }));
-
-  if (rowData.length > 0 && gridApi) {
+  if (rowData && gridApi) {
     gridApi.hideOverlay();
   }
 
@@ -54,6 +49,8 @@ const AccountListResults = ({ accounts }) => {
     onGridSizeChanged,
     columnDefs: GRID_ACCOUNT_COLUMN_DEFS
   };
+
+  console.log(gridOptions);
 
   return (
     <>
@@ -99,11 +96,11 @@ const AccountListResults = ({ accounts }) => {
 };
 
 AccountListResults.propTypes = {
-  accounts: PropTypes.object
+  rowData: PropTypes.array
 };
 
 AccountListResults.defaultProps = {
-  accounts: []
+  rowData: null
 };
 
 export default observer(AccountListResults);

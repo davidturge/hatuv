@@ -2,8 +2,7 @@ export const GENERAL_GRID_OPTIONS = {
   enableRtl: true,
   suppressRowClickSelection: true,
   rowSelection: 'multiple',
-  rowHeight: 60,
-  overlayMessage: 'טעינה...'
+  rowHeight: 60
 };
 
 export const GRID_DEFAULT_DEFS = {
