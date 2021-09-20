@@ -12,11 +12,18 @@ import { AvatarLetterCell } from '../cells/AvatarCell';
 import SwitchCell from '../cells/SwitchCell';
 import useWindowResize from '../../hooks/useWindowResize';
 import { GENERAL_GRID_OPTIONS, GRID_DEFAULT_DEFS, GRID_USER_COLUMN_DEFS } from '../../constants/grids';
+import { getInitials } from '../../utils/utils';
 
-const UserListResults = ({ rowData }) => {
+const UserListResults = ({ users }) => {
   const [gridApi, setGridApi] = useState(null);
   const { uiStore, userStore } = useStore();
   const { height } = useWindowResize(292);
+
+  const rowData = Array.from(users, ([, value]) => ({
+    initials: getInitials(`${value.firstName} ${value.lastName}`),
+    groupsCount: value.groups.length,
+    ...value
+  }));
 
   if (rowData && gridApi) {
     gridApi.hideOverlay();
@@ -101,11 +108,11 @@ const UserListResults = ({ rowData }) => {
 };
 
 UserListResults.propTypes = {
-  rowData: PropTypes.array
+  users: PropTypes.any
 };
 
 UserListResults.defaultProps = {
-  rowData: null
+  users: null
 };
 
 export default observer(UserListResults);

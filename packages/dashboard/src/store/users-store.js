@@ -51,14 +51,14 @@ function createUserStore() {
         throw Error(error);
       }
     },
-    getByAccountId: async (currentUserId, currentAccountId) => {
+    getAllByAccountId: async (currentUserId, currentAccountId) => {
       store.setState('pending');
       try {
         const getUsersByAccountQuery = db.collectionGroup(store.collectionName).where('accountId', '==', currentAccountId);
         const snapshot = await getUsersByAccountQuery.get();
         snapshot.forEach((doc) => {
           if (doc.id !== currentUserId) {
-            store.setUser(doc.id, { ...doc.data(), id: doc.id });
+            store.setUser(doc.id, doc.data());
           }
         });
         store.setState('done');
@@ -117,14 +117,16 @@ function createUserStore() {
       }
     },
     update: async (user) => {
+      store.setState('pending');
       try {
         await db.collection(store.collectionName).doc(user.id).set({ ...user });
         store.setUser(user.id, { ...store.users.get(user.id), ...user });
+        store.setState('done');
       } catch (error) {
+        store.setState('error');
         throw Error(error);
       }
     },
-    delete: async () => {},
     setState: (newState) => {
       store.state = newState;
     }

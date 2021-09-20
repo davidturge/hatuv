@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { useStore } from '../../store/store-context';
-import { ACCOUNT_REGISTRATION_FORM_CONSTANTS, ACCOUNT_ACTIONS_MESSAGES_CONSTANTS } from '../../constants/forms';
+import { ACCOUNT_FORM_CONSTANTS, ACCOUNT_ACTIONS_MESSAGES_CONSTANTS } from '../../constants/forms';
 import { phone } from '../../utils/formValidations';
 
 const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
@@ -15,12 +15,7 @@ const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
     email: '',
     phone: ''
   };
-  const account = id ? {
-    ...accountStore.accounts.get(id),
-    city: accountStore.accounts.get(id).address.city,
-    houseNumber: accountStore.accounts.get(id).address.houseNumber,
-    street: accountStore.accounts.get(id).address.street
-  } : initialAccountValue;
+  const account = id ? accountStore.accounts.get(id) : initialAccountValue;
 
   // const setAddressOnSave = (data) => {
   //   const newAccount = Object.entries(data).reduce((res, [key, value]) => {
@@ -35,11 +30,11 @@ const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
   // };
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email(ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyEmail.validation.error).max(255)
-      .required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyEmail.validation.required),
-    name: Yup.string().max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyName.validation.required),
-    phone: Yup.string().matches(phone, ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.error)
-      .required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.required)
+    email: Yup.string().email(ACCOUNT_FORM_CONSTANTS.companyEmail.validation.error).max(255)
+      .required(ACCOUNT_FORM_CONSTANTS.companyEmail.validation.required),
+    name: Yup.string().max(255).required(ACCOUNT_FORM_CONSTANTS.companyName.validation.required),
+    phone: Yup.string().matches(phone, ACCOUNT_FORM_CONSTANTS.phone.validation.error)
+      .required(ACCOUNT_FORM_CONSTANTS.phone.validation.required)
   });
 
   const formik = useFormik({
@@ -77,7 +72,7 @@ const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
             id="name"
             name="name"
             value={formik.values.name}
-            placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyName.placeholder}
+            placeholder={ACCOUNT_FORM_CONSTANTS.companyName.placeholder}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.touched.name && Boolean(formik.errors.name)}
@@ -89,7 +84,7 @@ const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
             id="email"
             name="email"
             value={formik.values.email}
-            placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyEmail.placeholder}
+            placeholder={ACCOUNT_FORM_CONSTANTS.companyEmail.placeholder}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
@@ -101,7 +96,7 @@ const AccountProfile1 = ({ id, closeDialog, showSnackbar }) => {
             id="phone"
             name="phone"
             value={formik.values.phone}
-            placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.placeholder}
+            placeholder={ACCOUNT_FORM_CONSTANTS.phone.placeholder}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.touched.phone && Boolean(formik.errors.phone)}

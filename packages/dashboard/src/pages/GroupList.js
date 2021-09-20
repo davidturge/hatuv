@@ -1,20 +1,31 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { observer } from 'mobx-react';
+import { useStore } from '../store/store-context';
 import GroupListToolbar from '../components/group/GroupListToolbar';
 import GroupListResults from '../components/group/GroupListResults';
-import { useStore } from '../store/store-context';
+import { PermissionEnum } from '../models/user';
+import { useAuth } from '../store/auth-context';
 
 const GroupList = () => {
-  const [selectedEntitiesIds, setSelectedEntitiesIds] = useState([]);
   const { groupStore } = useStore();
+  const { currentUser } = useAuth();
+  const { uiStore } = useStore();
 
   useEffect(() => {
-    const getGroups = async () => {
-      await groupStore.getAll();
+    const getGroups = async (permission) => {
+      if (permission === PermissionEnum.SUPER_USER) {
+        await groupStore.getAll(currentUser.id);
+      } else if (permission === PermissionEnum.ACCOUNT_ADMIN) {
+        await groupStore.getAllByAccountId(currentUser.id, currentUser.accountId);
+      } else {
+        await groupStore.getAllByUserId(currentUser.id);
+      }
     };
-    getGroups();
+    getGroups(currentUser.permission);
     return () => {
+      uiStore.setSelectedEntities([]);
       groupStore.setState('pending');
     };
   }, []);
@@ -22,7 +33,7 @@ const GroupList = () => {
   return (
     <>
       <Helmet>
-        <title>קבוצות</title>
+        <title>משתמשים</title>
       </Helmet>
       <Box
         sx={{
@@ -32,12 +43,9 @@ const GroupList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <GroupListToolbar selectedGroupsIds={selectedEntitiesIds} />
+          <GroupListToolbar selectedEntities={uiStore.selectedEntities} />
           <Box sx={{ pt: 3 }}>
-            <GroupListResults
-              groups={groupStore.groups}
-              entitiesState={{ selectedEntitiesIds, setSelectedEntitiesIds }}
-            />
+            <GroupListResults groups={groupStore.groups} state={groupStore.state} />
           </Box>
         </Container>
       </Box>
@@ -45,4 +53,4 @@ const GroupList = () => {
   );
 };
 
-export default GroupList;
+export default observer(GroupList);

@@ -1,31 +1,27 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { useStore } from '../store/store-context';
 import UserListToolbar from '../components/user/UserListToolbar';
 import UserListResults from '../components/user/UserListResults';
 import { useAuth } from '../store/auth-context';
-import { getInitials } from '../utils/utils';
-// import { getInitials } from '../utils/utils';
+import { PermissionEnum } from '../models/user';
 
 const UserList = () => {
   const { userStore } = useStore();
   const { currentUser } = useAuth();
   const { uiStore } = useStore();
-  const [rowData, setRowData] = useState([]);
 
   useEffect(() => {
-    const getUsers = async () => {
-      await userStore.getByAccountId(currentUser.id, currentUser.accountId);
-      const data = Array.from(userStore.users, ([, value]) => ({
-        initials: getInitials(`${value.firstName} ${value.lastName}`),
-        groupsCount: value.groups.length,
-        ...value
-      }));
-      setRowData(data);
+    const getUsers = async (permission) => {
+      if (permission === PermissionEnum.SUPER_USER) {
+        await userStore.getAll(currentUser.id);
+      } else {
+        await userStore.getAllByAccountId(currentUser.id, currentUser.accountId);
+      }
     };
-    getUsers();
+    getUsers(currentUser.permission);
     return () => {
       uiStore.setSelectedEntities([]);
       userStore.setState('pending');
@@ -47,7 +43,7 @@ const UserList = () => {
         <Container maxWidth={false}>
           <UserListToolbar selectedEntities={uiStore.selectedEntities} />
           <Box sx={{ pt: 3 }}>
-            <UserListResults rowData={rowData} />
+            <UserListResults users={userStore.users} />
           </Box>
         </Container>
       </Box>

@@ -1,125 +1,96 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { observer } from 'mobx-react';
-import PropTypes from 'prop-types';
-import {
-  Box, Button, Container, Link, TextField, Typography
-} from '@material-ui/core';
-import { Formik } from 'formik';
+import { Box, Button, TextField } from '@material-ui/core';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Link as RouterLink } from 'react-router-dom';
-import Group from '../../models/group';
-import StoreContext from '../../store/store-context';
+import PropTypes from 'prop-types';
+import { observer } from 'mobx-react';
+import { useStore } from '../../store/store-context';
+import { GROUP_ACTIONS_MESSAGES_CONSTANTS, GROUP_FORM_CONSTANTS } from '../../constants/forms';
+import { useAuth } from '../../store/auth-context';
 
-const GroupProfile = ({ id }) => {
-  const { groupStore } = useContext(StoreContext);
-  const [group, setGroup] = useState(new Group({}));
+const GroupProfile = ({ id, closeDialog, showSnackbar }) => {
+  const { groupStore } = useStore();
+  const { uiStore } = useStore();
+  const { currentUser } = useAuth();
+  const initialAccountValue = {
+    name: ''
+  };
 
-  useEffect(() => {
-    if (id) {
-      const getGroup = async () => {
-        try {
-          const currGroup = await groupStore.getById(id);
-          setGroup(currGroup);
-        } catch (e) {
-          // setSnackbarProps({ open: true, severity: 'error', message: 'unable tp load group data' });
+  const group = id ? groupStore.groups.get(id) : initialAccountValue;
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().max(255).required(GROUP_FORM_CONSTANTS.name.validation.required)
+  });
+
+  const formik = useFormik({
+    initialValues: group,
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        if (values.id) {
+          await groupStore.update(values);
+          showSnackbar({ severity: 'success', message: GROUP_ACTIONS_MESSAGES_CONSTANTS.success.update });
+        } else {
+          await groupStore.save(
+            {
+              userId: currentUser.id,
+              userName: `${currentUser.firstName} ${currentUser.lastName}`,
+              accountId: currentUser.accountId,
+              group: values
+            }
+          );
+          showSnackbar({ severity: 'success', message: GROUP_ACTIONS_MESSAGES_CONSTANTS.success.create });
         }
-      };
-      getGroup();
-    } else {
-      // groupStore.setState('success');
+        uiStore.setSelectedEntities([]);
+        closeDialog();
+      } catch (error) {
+        showSnackbar({ severity: 'error', message: error.message });
+        throw Error(error);
+      }
     }
-  }, []);
+  });
+
+  const handleCloseDialog = () => {
+    closeDialog();
+  };
 
   return (
     <>
-      {
-        group
-        && (
-          <>
-            <Box
-              sx={{
-                backgroundColor: 'background.default',
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                justifyContent: 'center'
-              }}
-            >
-              <Container maxWidth="sm">
-                <Formik
-                  initialValues={{
-                    name: group.name
-                  }}
-                  validationSchema={Yup.object().shape({})}
-                  onSubmit={(values) => {
-                    console.log(values);
-                  }}
-                  enableReinitialize
-                >
-                  {({
-                    handleBlur,
-                    handleChange,
-                    handleSubmit,
-                    isSubmitting,
-                    values
-                  }) => (
-                    <form onSubmit={handleSubmit}>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography
-                          color="textPrimary"
-                          variant="h2"
-                        >
-                          יצירת קבוצה
-                        </Typography>
-                      </Box>
-                      <TextField
-                        fullWidth
-                        placeholder="כתובת "
-                        margin="normal"
-                        name="name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="name"
-                        value={values.name}
-                        variant="outlined"
-                      />
-                      <Box sx={{ py: 2 }}>
-                        <Button
-                          color="primary"
-                          disabled={isSubmitting}
-                          fullWidth
-                          size="large"
-                          type="submit"
-                          variant="contained"
-                        >
-                          התחבר
-                        </Button>
-                      </Box>
-                      <Typography
-                        color="textSecondary"
-                        variant="body1"
-                      >
-                        {' '}
-                        <Link
-                          component={RouterLink}
-                          to="/register"
-                          variant="h6"
-                        />
-                      </Typography>
-                    </form>
-                  )}
-                </Formik>
-              </Container>
-            </Box>
-          </>
-        )
-      }
+      <Box>
+        <form onSubmit={formik.handleSubmit}>
+          <TextField
+            margin="normal"
+            fullWidth
+            id="name"
+            name="name"
+            value={formik.values.name}
+            placeholder={GROUP_FORM_CONSTANTS.name.placeholder}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.name && Boolean(formik.errors.name)}
+            helperText={formik.touched.name && formik.errors.name}
+          />
+          <Button color="primary" variant="contained" type="submit">
+            שמור
+          </Button>
+          <Button color="primary" variant="contained" onClick={handleCloseDialog}>
+            בטל
+          </Button>
+        </form>
+      </Box>
     </>
   );
 };
 
 GroupProfile.propTypes = {
-  id: PropTypes.string
+  id: PropTypes.string,
+  closeDialog: PropTypes.func,
+  showSnackbar: PropTypes.func
+};
+
+GroupProfile.defaultProps = {
+  id: null,
+  closeDialog: null,
+  showSnackbar: null
 };
 
 export default observer(GroupProfile);

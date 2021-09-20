@@ -93,3 +93,21 @@ export const GRID_USER_COLUMN_DEFS = (onActiveChanged) => [
     cellRendererParams: { onActiveChanged },
   }
 ];
+
+export const GRID_GROUP_COLUMN_DEFS = [
+  {
+    field: 'name',
+    headerName: 'שם',
+    width: 120,
+    minWidth: 150,
+    headerCheckboxSelection: true,
+    headerCheckboxSelectionFilteredOnly: true,
+    checkboxSelection: true
+  },
+  {
+    field: 'tvsCount',
+    headerName: 'מספר טלויזיות',
+    width: 120,
+    minWidth: 150
+  }
+];

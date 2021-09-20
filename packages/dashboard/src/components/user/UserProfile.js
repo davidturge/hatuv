@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { useStore } from '../../store/store-context';
-import { USER_ACTIONS_MESSAGES_CONSTANTS, USER_REGISTRATION_FORM_CONSTANTS } from '../../constants/forms';
+import { USER_ACTIONS_MESSAGES_CONSTANTS, USER_FORM_CONSTANTS } from '../../constants/forms';
 
 const UserProfile = ({ id, closeDialog, showSnackbar }) => {
   const { userStore } = useStore();
@@ -12,8 +12,8 @@ const UserProfile = ({ id, closeDialog, showSnackbar }) => {
   const user = userStore.users.get(id);
 
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.firstName.validation.required),
-    lastName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.lastName.validation.required),
+    firstName: Yup.string().max(255).required(USER_FORM_CONSTANTS.firstName.validation.required),
+    lastName: Yup.string().max(255).required(USER_FORM_CONSTANTS.lastName.validation.required),
   });
 
   const formik = useFormik({
@@ -46,7 +46,7 @@ const UserProfile = ({ id, closeDialog, showSnackbar }) => {
             id="firstName"
             name="firstName"
             value={formik.values.firstName}
-            placeholder={USER_REGISTRATION_FORM_CONSTANTS.firstName.placeholder}
+            placeholder={USER_FORM_CONSTANTS.firstName.placeholder}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -58,7 +58,7 @@ const UserProfile = ({ id, closeDialog, showSnackbar }) => {
             id="lastName"
             name="lastName"
             value={formik.values.lastName}
-            placeholder={USER_REGISTRATION_FORM_CONSTANTS.lastName.placeholder}
+            placeholder={USER_FORM_CONSTANTS.lastName.placeholder}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.touched.lastName && Boolean(formik.errors.lastName)}

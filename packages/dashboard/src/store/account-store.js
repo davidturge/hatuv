@@ -74,6 +74,7 @@ export default function createAccountStore(userStore) {
       }
     },
     save: async (account, user = null) => {
+      store.setState('pending');
       try {
         const ref = await db.collection(store.collectionName).doc();
         const newAccount = { ...account, id: ref.id };
@@ -85,19 +86,25 @@ export default function createAccountStore(userStore) {
           await userStore.signup({ user, accountId: newAccount.id, permission: 0 });
         }
         store.setAccount(ref.id, newAccount);
+        store.setState('done');
       } catch (error) {
+        store.setState('error');
         throw Error(error);
       }
     },
     update: async (account) => {
+      store.setState('pending');
       try {
         await db.collection(store.collectionName).doc(account.id).set({ ...account });
         store.setAccount(account.id, { ...store.accounts.get(account.id), ...account });
+        store.setState('done');
       } catch (error) {
+        store.setState('error');
         throw Error(error);
       }
     },
     delete: async (accountsIds) => {
+      store.setState('pending');
       try {
         const batch = db.batch();
         accountsIds.forEach((id) => {
@@ -106,7 +113,9 @@ export default function createAccountStore(userStore) {
         });
         await batch.commit();
         accountsIds.forEach((id) => store.deleteAccount(id));
+        store.setState('done');
       } catch (error) {
+        store.setState('error');
         throw Error(error);
       }
     },

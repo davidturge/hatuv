@@ -1,4 +1,4 @@
-export const ACCOUNT_REGISTRATION_FORM_CONSTANTS = {
+export const ACCOUNT_FORM_CONSTANTS = {
   companyName: {
     placeholder: 'שם החברה',
     validation: {
@@ -56,7 +56,7 @@ export const ACCOUNT_ACTIONS_MESSAGES_CONSTANTS = {
   errors: {}
 };
 
-export const USER_REGISTRATION_FORM_CONSTANTS = {
+export const USER_FORM_CONSTANTS = {
   email: {
     placeholder: 'דוא"ל',
     validation: {
@@ -98,6 +98,25 @@ export const USER_ACTIONS_MESSAGES_CONSTANTS = {
     update: 'משתמש עודכן בהצלחה',
     delete: 'משתמש הוסר בהצלחה',
     deleteMultiple: 'משתמשים הוסרו בהצלחה'
+  },
+  errors: {}
+};
+
+export const GROUP_FORM_CONSTANTS = {
+  name: {
+    placeholder: 'שם',
+    validation: {
+      required: 'שדה חובה'
+    }
+  }
+};
+
+export const GROUP_ACTIONS_MESSAGES_CONSTANTS = {
+  success: {
+    create: 'קבוצה נוספה בהצלחה',
+    update: 'קבוצה עודכנה בהצלחה',
+    delete: 'קבוצה עודכנה בהצלחה',
+    deleteMultiple: 'קבוצות הוסרו בהצלחה'
   },
   errors: {}
 };

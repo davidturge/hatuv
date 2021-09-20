@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import { useStore } from '../store/store-context';
 // import { encrypt } from '../utils/utils';
-import { ACCOUNT_REGISTRATION_FORM_CONSTANTS, USER_REGISTRATION_FORM_CONSTANTS } from '../constants/forms';
+import { ACCOUNT_FORM_CONSTANTS, USER_FORM_CONSTANTS } from '../constants/forms';
 import { passwordStrength, phone } from '../utils/formValidations';
 // import FileUploader from '../components/FileUploader';
 
@@ -80,18 +80,18 @@ const AccountRegistration = () => {
             }}
             validationSchema={
               Yup.object().shape({
-                companyName: Yup.string().max(255).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyName.validation.required),
-                phone: Yup.string().matches(phone, ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.error).required(ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.validation.required),
-                email: Yup.string().email(USER_REGISTRATION_FORM_CONSTANTS.email.validation.required).max(255).required(USER_REGISTRATION_FORM_CONSTANTS.email.validation.required),
-                firstName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.firstName.validation.required),
-                lastName: Yup.string().max(255).required(USER_REGISTRATION_FORM_CONSTANTS.lastName.validation.required),
-                password: Yup.string().matches(passwordStrength, USER_REGISTRATION_FORM_CONSTANTS.password.validation.error)
-                  .required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required),
-                confirmPassword: Yup.string().required(USER_REGISTRATION_FORM_CONSTANTS.password.validation.required).when('password', {
+                companyName: Yup.string().max(255).required(ACCOUNT_FORM_CONSTANTS.companyName.validation.required),
+                phone: Yup.string().matches(phone, ACCOUNT_FORM_CONSTANTS.phone.validation.error).required(ACCOUNT_FORM_CONSTANTS.phone.validation.required),
+                email: Yup.string().email(USER_FORM_CONSTANTS.email.validation.required).max(255).required(USER_FORM_CONSTANTS.email.validation.required),
+                firstName: Yup.string().max(255).required(USER_FORM_CONSTANTS.firstName.validation.required),
+                lastName: Yup.string().max(255).required(USER_FORM_CONSTANTS.lastName.validation.required),
+                password: Yup.string().matches(passwordStrength, USER_FORM_CONSTANTS.password.validation.error)
+                  .required(USER_FORM_CONSTANTS.password.validation.required),
+                confirmPassword: Yup.string().required(USER_FORM_CONSTANTS.password.validation.required).when('password', {
                   is: (val) => (!!(val && val.length > 0)),
                   then: Yup.string().oneOf(
                     [Yup.ref('password')],
-                    USER_REGISTRATION_FORM_CONSTANTS.confirmPassword.validation.error
+                    USER_FORM_CONSTANTS.confirmPassword.validation.error
                   )
                 }),
                 policy: Yup.boolean().oneOf([true], 'נא לאשר את התקנון בבקשה')
@@ -126,7 +126,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.companyName && errors.companyName)}
                     fullWidth
                     helperText={touched.companyName && errors.companyName}
-                    placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.companyName.placeholder}
+                    placeholder={ACCOUNT_FORM_CONSTANTS.companyName.placeholder}
                     margin="normal"
                     name="companyName"
                     onBlur={handleBlur}
@@ -139,7 +139,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.firstName && errors.firstName)}
                     fullWidth
                     helperText={touched.firstName && errors.firstName}
-                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.firstName.placeholder}
+                    placeholder={USER_FORM_CONSTANTS.firstName.placeholder}
                     margin="normal"
                     name="firstName"
                     onBlur={handleBlur}
@@ -152,7 +152,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.lastName && errors.lastName)}
                     fullWidth
                     helperText={touched.lastName && errors.lastName}
-                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.lastName.placeholder}
+                    placeholder={USER_FORM_CONSTANTS.lastName.placeholder}
                     margin="normal"
                     name="lastName"
                     onBlur={handleBlur}
@@ -165,7 +165,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.phone && errors.phone)}
                     fullWidth
                     helperText={touched.phone && errors.phone}
-                    placeholder={ACCOUNT_REGISTRATION_FORM_CONSTANTS.phone.placeholder}
+                    placeholder={ACCOUNT_FORM_CONSTANTS.phone.placeholder}
                     margin="normal"
                     name="phone"
                     onBlur={handleBlur}
@@ -179,7 +179,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.email && errors.email)}
                     fullWidth
                     helperText={touched.email && errors.email}
-                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.email.placeholder}
+                    placeholder={USER_FORM_CONSTANTS.email.placeholder}
                     margin="normal"
                     name="email"
                     onBlur={handleBlur}
@@ -192,7 +192,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.password && errors.password)}
                     fullWidth
                     helperText={touched.password && errors.password}
-                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.password.placeholder}
+                    placeholder={USER_FORM_CONSTANTS.password.placeholder}
                     margin="normal"
                     name="password"
                     onBlur={handleBlur}
@@ -205,7 +205,7 @@ const AccountRegistration = () => {
                     error={Boolean(touched.confirmPassword && errors.confirmPassword)}
                     fullWidth
                     helperText={touched.confirmPassword && errors.confirmPassword}
-                    placeholder={USER_REGISTRATION_FORM_CONSTANTS.confirmPassword.placeholder}
+                    placeholder={USER_FORM_CONSTANTS.confirmPassword.placeholder}
                     margin="normal"
                     name="confirmPassword"
                     onBlur={handleBlur}
